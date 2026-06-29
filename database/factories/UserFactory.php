@@ -26,7 +26,7 @@ class UserFactory extends Factory
             'role'              => UserRole::Client,
             'address'           => fake()->address(),
             'is_active'         => true,
-            'email_verified_at' => now(),
+            'phone_verified_at' => now(),
             'remember_token'    => Str::random(10),
         ];
     }

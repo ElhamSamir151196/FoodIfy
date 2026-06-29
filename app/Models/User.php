@@ -16,32 +16,26 @@ class User extends Authenticatable
     // Fillable
     // ─────────────────────────────────────────
     protected $fillable = [
-        'full_name',
-        'email',
-        'password',
-        'phone',
-        'avatar',
-        'role',
-        'address',
-        'is_active',
+        'full_name',  'email', 'password',
+        'phone', 'avatar', 'role',
+        'address','birth_date', 'is_active',
     ];
 
     // ─────────────────────────────────────────
     // Hidden
     // ─────────────────────────────────────────
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = [  'password', 'remember_token' ];
 
     // ─────────────────────────────────────────
     // Casts
     // ─────────────────────────────────────────
     protected $casts = [
-        'email_verified_at' => 'datetime',
         'password'          => 'hashed',
         'role'              => UserRole::class,
         'is_active'         => 'boolean',
+        'birth_date'        => 'date',
+        'phone_verified_at' => 'datetime', // ✅
+
     ];
 
     // ─────────────────────────────────────────
