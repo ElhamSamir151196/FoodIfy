@@ -1,8 +1,25 @@
 <?php
 
-use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\api\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
 
+Route::prefix('auth')->group(function () {
+    Route::post('register',              [AuthController::class, 'register']);
+    Route::post('register/verify',       [AuthController::class, 'verifyRegister']);
+    Route::post('login',                 [AuthController::class, 'login']);
+    Route::post('forget-password',       [AuthController::class, 'forgetPassword']);
+    Route::post('forget-password/verify',[AuthController::class, 'verifyResetOtp']);
+    Route::post('reset-password',        [AuthController::class, 'resetPassword']);
+});
+
+Route::middleware(['auth:sanctum', 'active'])->group(function () {
+    Route::prefix('auth')->group(function () {
+        Route::post('logout', [AuthController::class, 'logout']);
+        Route::get('me',      [AuthController::class, 'me']);
+    });
+});
+
+/*
 // ─────────────────────────────────────────
 // Public Routes
 // ─────────────────────────────────────────
@@ -34,3 +51,5 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
     });
 
 });
+
+*/
