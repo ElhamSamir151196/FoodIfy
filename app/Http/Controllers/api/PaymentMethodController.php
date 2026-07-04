@@ -1,66 +1,59 @@
 <?php
 
-namespace App\Http\Controllers\api;
+namespace App\Http\Controllers\Api;
 
-use App\Models\PaymentMethod;
+use App\Actions\PaymentMethod\AddPaymentMethodAction;
+use App\Actions\PaymentMethod\DeletePaymentMethodAction;
+use App\Actions\PaymentMethod\GetPaymentMethodsAction;
+use App\Actions\PaymentMethod\SetDefaultPaymentMethodAction;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\PaymentMethod\StorePaymentMethodRequest;
+use App\Http\Resources\PaymentMethodResource;
+use App\Traits\ApiResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller; // ✅ ده المهم
 
 class PaymentMethodController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    use ApiResponse;
+
+    public function index(Request $request, GetPaymentMethodsAction $action): JsonResponse
     {
-        //
+        $methods = $action->execute($request->user()->id);
+
+        return $this->success(data: ['payment_methods' => PaymentMethodResource::collection($methods)]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(StorePaymentMethodRequest $request, AddPaymentMethodAction $action): JsonResponse
     {
-        //
+        $method = $action->execute($request->user()->id, $request->validated());
+
+        return $this->success(
+            data: ['payment_method' => new PaymentMethodResource($method)],
+            message: 'Payment method added.',
+            statusCode: 201
+        );
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function setDefault(int $id, Request $request, SetDefaultPaymentMethodAction $action): JsonResponse
     {
-        //
+        $updated = $action->execute($request->user()->id, $id);
+
+        if (!$updated) {
+            return $this->error('Payment method not found.', 404);
+        }
+
+        return $this->success(message: 'Default payment method updated.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(PaymentMethod $paymentMethod)
+    public function destroy(int $id, Request $request, DeletePaymentMethodAction $action): JsonResponse
     {
-        //
-    }
+        $deleted = $action->execute($request->user()->id, $id);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(PaymentMethod $paymentMethod)
-    {
-        //
-    }
+        if (!$deleted) {
+            return $this->error('Payment method not found.', 404);
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, PaymentMethod $paymentMethod)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(PaymentMethod $paymentMethod)
-    {
-        //
+        return $this->success(message: 'Payment method deleted.');
     }
 }

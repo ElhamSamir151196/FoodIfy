@@ -10,9 +10,11 @@
         "laravel/sanctum": "^4.3",
         "laravel/tinker": "^2.9",
         "predis/predis": "^3.5",
+        "twilio/sdk": "^8.11",
         "vonage/client-core": "^4.3"
     },
     "require-dev": {
+        "beyondcode/laravel-er-diagram-generator": "^6.0",
         "fakerphp/faker": "^1.23",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",

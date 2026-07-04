@@ -1,0 +1,20 @@
+<?php
+
+namespace App\Http\Requests\Favorite;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class ToggleFavoriteRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'meal_id' => ['required', 'integer', 'exists:meals,id'],
+        ];
+    }
+}
