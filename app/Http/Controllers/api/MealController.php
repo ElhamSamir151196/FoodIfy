@@ -1,66 +1,84 @@
 <?php
 
-namespace App\Http\Controllers\api;
+namespace App\Http\Controllers\Api;
 
+use App\Actions\Meal\CreateMealAction;
+use App\Actions\Meal\DeleteMealAction;
+use App\Actions\Meal\GetMealAction;
+use App\Actions\Meal\GetMealsAction;
+use App\Actions\Meal\ToggleAvailabilityAction;
+use App\Actions\Meal\UpdateMealAction;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Meal\StoreMealRequest;
+use App\Http\Requests\Meal\UpdateMealRequest;
+use App\Http\Resources\MealResource;
 use App\Models\Meal;
+use App\Traits\ApiResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller; // ✅ ده المهم
 
 class MealController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    use ApiResponse;
+
+    // ── Public ────────────────────────────
+    public function index(Request $request, GetMealsAction $action): JsonResponse
     {
-        //
+        $meals = $action->execute(
+            categoryId: $request->integer('category_id') ?: null,
+            search: $request->query('search') ?: null,
+        );
+
+        return $this->success(data: ['meals' => MealResource::collection($meals)]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function show(int $id, GetMealAction $action): JsonResponse
     {
-        //
+        $meal = $action->execute($id);
+
+        if (!$meal) {
+            return $this->error('Meal not found.', 404);
+        }
+
+        return $this->success(data: ['meal' => new MealResource($meal)]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    // ── Admin ─────────────────────────────
+    public function store(StoreMealRequest $request, CreateMealAction $action): JsonResponse
     {
-        //
+        $meal = $action->execute($request->validated());
+
+        return $this->success(
+            data: ['meal' => new MealResource($meal->load('category'))],
+            message: 'Meal created successfully.',
+            statusCode: 201
+        );
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Meal $meal)
+    public function update(UpdateMealRequest $request, Meal $meal, UpdateMealAction $action): JsonResponse
     {
-        //
+        $meal = $action->execute($meal, $request->validated());
+
+        return $this->success(
+            data: ['meal' => new MealResource($meal)],
+            message: 'Meal updated successfully.'
+        );
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Meal $meal)
+    public function destroy(Meal $meal, DeleteMealAction $action): JsonResponse
     {
-        //
+        $action->execute($meal);
+
+        return $this->success(message: 'Meal deleted successfully.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Meal $meal)
+    public function toggleAvailability(Meal $meal, ToggleAvailabilityAction $action): JsonResponse
     {
-        //
-    }
+        $meal = $action->execute($meal);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Meal $meal)
-    {
-        //
+        return $this->success(
+            data: ['meal' => new MealResource($meal)],
+            message: 'Meal availability updated.'
+        );
     }
 }

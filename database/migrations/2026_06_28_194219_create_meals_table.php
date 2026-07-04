@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('category_id')->constrained()->cascadeOnDelete();
             $table->string('name');
-            $table->text('description')->nullable();
+            $table->string('image');
+            $table->text('description');
             $table->decimal('price', 10, 2)->default(0);
             $table->decimal('calories', 8, 2)->nullable();
             $table->decimal('carbs', 8, 2)->nullable();
@@ -24,9 +25,7 @@ return new class extends Migration
             $table->decimal('fiber', 8, 2)->nullable();
             $table->decimal('sugar', 8, 2)->nullable();
             $table->decimal('sodium', 8, 2)->nullable();
-            $table->string('address')->nullable();
-            $table->string('location')->nullable(); // lat,lng
-            $table->json('working_hours')->nullable();
+            $table->json('ingredients')->nullable();
             $table->boolean('is_available')->default(true);
             $table->timestamps();
         });

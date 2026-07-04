@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\api\Auth;
+namespace App\Http\Controllers\Api\Auth;
 
 use App\Actions\Auth\ForgetPasswordAction;
 use App\Actions\Auth\LoginAction;

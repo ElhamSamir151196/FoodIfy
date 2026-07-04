@@ -13,20 +13,22 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            /*$table->foreignId('user_id')->constrained()->cascadeOnDelete();
+           $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('rider_id')->nullable()->constrained('delivery_riders')->nullOnDelete();
             $table->foreignId('payment_method_id')->nullable()->constrained()->nullOnDelete();
             $table->string('delivery_address');
-            $table->string('delivery_trip')->nullable();
-            $table->text('note')->nullable();
-            $table->decimal('subtotal', 10, 2)->default(0);
-            $table->decimal('delivery_fee', 10, 2)->default(0);
-            $table->decimal('total', 10, 2)->default(0);
-            $table->string('tracking_status')->default('pending');
-            // pending, confirmed, preparing, picked_up, on_the_way, delivered, cancelled
-            $table->string('estimated_delivery')->nullable();
-            $table->timestamp('placed_at')->nullable();
-            $table->string('cancel_reason')->nullable();
-            $table->foreignId('delivery_rider_id')->nullable()->constrained('delivery_riders')->nullOnDelete();*/
+            $table->decimal('delivery_lat', 10, 7)->nullable();
+            $table->decimal('delivery_lng', 10, 7)->nullable();
+            $table->text('notes')->nullable();
+            $table->decimal('subtotal', 10, 2);
+            $table->decimal('delivery_fee', 8, 2);
+            $table->decimal('total', 10, 2);
+            $table->enum('status', ['pending', 'confirmed', 'delivering', 'delivered', 'cancelled'])->default('pending');
+            $table->enum('tracking_status', ['assigned', 'picked_up', 'on_the_way', 'arrived'])->nullable();
+            $table->unsignedInteger('estimated_minutes')->nullable();
+            $table->timestamp('paid_at')->nullable();
+            $table->timestamp('cancelled_at')->nullable();
+            $table->string('cancellation_reason')->nullable();
             $table->timestamps();
         });
     }

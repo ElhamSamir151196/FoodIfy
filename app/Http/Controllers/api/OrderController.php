@@ -1,66 +1,59 @@
 <?php
 
-namespace App\Http\Controllers\api;
+namespace App\Http\Controllers\Api;
 
-use App\Models\Order;
+use App\Actions\Order\CheckoutAction;
+use App\Actions\Order\GetOrderAction;
+use App\Actions\Order\GetOrdersAction;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Order\CheckoutRequest;
+use App\Http\Resources\OrderResource;
+use App\Traits\ApiResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller; // ✅ ده المهم
 
 class OrderController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    use ApiResponse;
+
+    public function index(Request $request, GetOrdersAction $action): JsonResponse
     {
-        //
+        $orders = $action->execute($request->user()->id, $request->query('status'));
+
+        return $this->success(data: [
+            'orders' => OrderResource::collection($orders),
+            'meta' => [
+                'current_page' => $orders->currentPage(),
+                'last_page'    => $orders->lastPage(),
+                'per_page'     => $orders->perPage(),
+                'total'        => $orders->total(),
+            ],
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function show(int $id, Request $request, GetOrderAction $action): JsonResponse
     {
-        //
+        $order = $action->execute($id, $request->user()->id);
+
+        if (!$order) {
+            return $this->error('Order not found.', 404);
+        }
+
+        return $this->success(data: ['order' => new OrderResource($order)]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function checkout(CheckoutRequest $request, CheckoutAction $action): JsonResponse
     {
-        //
-    }
+        $order = $action->execute($request->user()->id, $request->validated());
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Order $order)
-    {
-        //
-    }
+        if (!$order) {
+            return $this->error('Your cart is empty.', 422);
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Order $order)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Order $order)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Order $order)
-    {
-        //
+        return $this->success(
+            data: ['order' => new OrderResource($order)],
+            message: 'Order placed successfully.',
+            statusCode: 201
+        );
     }
 }

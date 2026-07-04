@@ -2,24 +2,12 @@
 
 namespace App\Services;
 
+use App\Contracts\SmsGatewayInterface;
 use Illuminate\Support\Facades\Cache;
-use Vonage\Client;
-use Vonage\Client\Credentials\Basic;
-use Vonage\SMS\Message\SMS;
 
 class OtpService
 {
-    private Client $client;
-
-    public function __construct()
-    {
-        $this->client = new Client(
-            new Basic(
-                config('services.vonage.key'),
-                config('services.vonage.secret')
-            )
-        );
-    }
+    public function __construct(private readonly SmsGatewayInterface $smsGateway) {}
 
     // ── Keys ──────────────────────────────
     public function registerKey(string $phone): string
@@ -47,12 +35,9 @@ class OtpService
 
         Cache::put($key, $otp, now()->addMinute());
 
-        $this->client->sms()->send(
-            new SMS(
-                $phone,
-                config('services.vonage.sms_from'),
-                "Your Foodify OTP is: {$otp}. Valid for 1 minute."
-            )
+        $this->smsGateway->send(
+            $phone,
+            "Your Foodify OTP is: {$otp}. Valid for 1 minute."
         );
     }
 

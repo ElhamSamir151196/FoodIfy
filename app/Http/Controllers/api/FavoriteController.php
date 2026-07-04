@@ -1,66 +1,35 @@
 <?php
 
-namespace App\Http\Controllers\api;
+namespace App\Http\Controllers\Api;
 
-use App\Models\Favorite;
+use App\Actions\Favorite\GetFavoritesAction;
+use App\Actions\Favorite\ToggleFavoriteAction;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Favorite\ToggleFavoriteRequest;
+use App\Http\Resources\FavoriteResource;
+use App\Traits\ApiResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller; // ✅ ده المهم
 
 class FavoriteController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    use ApiResponse;
+
+    public function index(Request $request, GetFavoritesAction $action): JsonResponse
     {
-        //
+        $favorites = $action->execute($request->user()->id);
+
+        return $this->success(data: ['favorites' => FavoriteResource::collection($favorites)]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function toggle(ToggleFavoriteRequest $request, ToggleFavoriteAction $action): JsonResponse
     {
-        //
-    }
+        $result = $action->execute($request->user()->id, $request->meal_id);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $message = $result['status'] === 'added'
+            ? 'Meal added to favorites.'
+            : 'Meal removed from favorites.';
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Favorite $favorite)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Favorite $favorite)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Favorite $favorite)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Favorite $favorite)
-    {
-        //
+        return $this->success(data: $result, message: $message);
     }
 }

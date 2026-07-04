@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -20,7 +21,7 @@ class User extends Authenticatable
         'phone', 'avatar', 'role',
         'address','birth_date', 'is_active',
     ];
-
+    
     // ─────────────────────────────────────────
     // Hidden
     // ─────────────────────────────────────────
@@ -49,6 +50,11 @@ class User extends Authenticatable
     public function isClient(): bool
     {
         return $this->role === UserRole::Client;
+    }
+
+    public function scopeCustomers($query)
+    {
+        return $query->where('role', UserRole::Client);
     }
 
     // ─────────────────────────────────────────
@@ -84,6 +90,32 @@ class User extends Authenticatable
 
     public function cartItems()
     {
-        return $this->hasMany(CartItem::class);
+        return $this->hasMany(Cart::class);
     }
+   
+    public function paymentMethods(): HasMany
+    {
+        return $this->hasMany(PaymentMethod::class);
+    }
+
+    public function favoriteMeals(): BelongsToMany
+    {
+        return $this->belongsToMany(Meal::class, 'favorites')->withTimestamps();
+    }
+
+    public function cartMeals(): BelongsToMany
+    {
+        return $this->belongsToMany(Meal::class, 'cart_items')
+            ->withPivot('quantity')
+            ->withTimestamps();
+    }
+
+    public function mealReviews()
+    {
+        return $this->hasMany(MealReview::class);
+    }
+
+    
+
+   
 }

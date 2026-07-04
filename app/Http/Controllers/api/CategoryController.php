@@ -1,66 +1,69 @@
 <?php
 
-namespace App\Http\Controllers\api;
+namespace App\Http\Controllers\Api;
 
+use App\Actions\Category\CreateCategoryAction;
+use App\Actions\Category\DeleteCategoryAction;
+use App\Actions\Category\GetCategoriesAction;
+use App\Actions\Category\GetCategoryAction;
+use App\Actions\Category\UpdateCategoryAction;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Category\StoreCategoryRequest;
+use App\Http\Requests\Category\UpdateCategoryRequest;
+use App\Http\Resources\CategoryResource;
 use App\Models\Category;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller; // ✅ ده المهم
+use App\Traits\ApiResponse;
+use Illuminate\Http\JsonResponse;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    use ApiResponse;
+
+    // ── Public ────────────────────────────
+    public function index(GetCategoriesAction $action): JsonResponse
     {
-        //
+        $categories = $action->execute();
+
+        return $this->success(data: ['categories' => CategoryResource::collection($categories)]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function show(int $id, GetCategoryAction $action): JsonResponse
     {
-        //
+        $category = $action->execute($id);
+
+        if (!$category) {
+            return $this->error('Category not found.', 404);
+        }
+
+        return $this->success(data: ['category' => new CategoryResource($category)]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    // ── Admin ─────────────────────────────
+    public function store(StoreCategoryRequest $request, CreateCategoryAction $action): JsonResponse
     {
-        //
+        $category = $action->execute($request->validated());
+
+        return $this->success(
+            data: ['category' => new CategoryResource($category)],
+            message: 'Category created successfully.',
+            statusCode: 201
+        );
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Category $category)
+    public function update(UpdateCategoryRequest $request, Category $category, UpdateCategoryAction $action): JsonResponse
     {
-        //
+        $category = $action->execute($category, $request->validated());
+
+        return $this->success(
+            data: ['category' => new CategoryResource($category)],
+            message: 'Category updated successfully.'
+        );
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Category $category)
+    public function destroy(Category $category, DeleteCategoryAction $action): JsonResponse
     {
-        //
-    }
+        $action->execute($category);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Category $category)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Category $category)
-    {
-        //
+        return $this->success(message: 'Category deleted successfully.');
     }
 }

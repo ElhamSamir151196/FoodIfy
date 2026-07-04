@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\api;
+namespace App\Http\Controllers\Api;
 
 use App\Models\DeliveryRider;
 use Illuminate\Http\Request;
@@ -8,6 +8,8 @@ use App\Http\Controllers\Controller; // ✅ ده المهم
 
 class DeliveryRiderController extends Controller
 {
+
+    // future methods for delivery rider management can be added here
     /**
      * Display a listing of the resource.
      */
