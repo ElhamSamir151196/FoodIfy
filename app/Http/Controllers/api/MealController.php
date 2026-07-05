@@ -6,7 +6,6 @@ use App\Actions\Meal\CreateMealAction;
 use App\Actions\Meal\DeleteMealAction;
 use App\Actions\Meal\GetMealAction;
 use App\Actions\Meal\GetMealsAction;
-use App\Actions\Meal\ToggleAvailabilityAction;
 use App\Actions\Meal\UpdateMealAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Meal\StoreMealRequest;
@@ -49,7 +48,7 @@ class MealController extends Controller
         $meal = $action->execute($request->validated());
 
         return $this->success(
-            data: ['meal' => new MealResource($meal->load('category'))],
+            data: ['meal' => new MealResource($meal->load(['category']))],
             message: 'Meal created successfully.',
             statusCode: 201
         );
@@ -72,13 +71,4 @@ class MealController extends Controller
         return $this->success(message: 'Meal deleted successfully.');
     }
 
-    public function toggleAvailability(Meal $meal, ToggleAvailabilityAction $action): JsonResponse
-    {
-        $meal = $action->execute($meal);
-
-        return $this->success(
-            data: ['meal' => new MealResource($meal)],
-            message: 'Meal availability updated.'
-        );
-    }
 }

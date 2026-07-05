@@ -2,44 +2,26 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Admin\DashboardController;
-use App\Http\Controllers\Api\Admin\IngredientController;
-use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
-use App\Http\Controllers\Api\CartController;
-use App\Http\Controllers\Api\FavoriteController;
-use App\Http\Controllers\Api\MealController;
 use App\Http\Controllers\Api\NotificationController;
-use App\Http\Controllers\Api\OrderController;
-use App\Http\Controllers\Api\PaymentController;
-use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Api\ProfileController;
 
 // routes are defined in a separate file for better organization
 require __DIR__ . '/auth.php'; // Auth routes
 require __DIR__ . '/category.php'; // Category  routes
-
-Route::get('meals',           [MealController::class, 'index']);
-Route::get('meals/{id}',      [MealController::class, 'show']);
-
-
+require __DIR__ . '/meal.php'; // Meal routes
+require __DIR__ . '/favorite.php'; // Favorite routes
+require __DIR__ . '/cart.php'; // Cart routes
+require __DIR__ . '/order.php'; // Order routes
+require __DIR__ . '/payment.php'; // Payment routes
+require __DIR__ . '/delivery_rider.php'; // Delivery Rider routes
 /*
 |--------------------------------------------------------------------------
 | Authenticated Client Routes (Cart, Favorites, Profile, Notifications)
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth:sanctum')->group(function () {
-
-    // ── Cart ──────────────────────────────
-    Route::get('cart',                [CartController::class, 'index']);
-    Route::post('cart',               [CartController::class, 'store']);
-    Route::put('cart/{mealId}',       [CartController::class, 'update']);
-    Route::delete('cart/{mealId}',    [CartController::class, 'destroy']);
-    Route::delete('cart',             [CartController::class, 'clear']);
-
-    // ── Favorites ─────────────────────────
-    Route::get('favorites',           [FavoriteController::class, 'index']);
-    Route::post('favorites/toggle',   [FavoriteController::class, 'toggle']);
-
+   
     // ── Profile ───────────────────────────
     Route::get('profile',                    [ProfileController::class, 'show']);
     Route::put('profile',                    [ProfileController::class, 'update']);
@@ -53,30 +35,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('notifications/read-all',   [NotificationController::class, 'markAllAsRead']);
 });
 
-/*
-|--------------------------------------------------------------------------
-| Client Routes (Orders, Checkout, Payments)
-|--------------------------------------------------------------------------
-*/
-Route::middleware(['auth:sanctum', 'client'])->group(function () {
 
-    // ── Orders ────────────────────────────
-    Route::get('orders',      [OrderController::class, 'index']);
-    Route::get('orders/{id}', [OrderController::class, 'show']);
-    Route::post('checkout',   [OrderController::class, 'checkout']);
-
-    // ── Payments ──────────────────────────
-    Route::post('orders/{order}/pay', [PaymentController::class, 'initiate']);
-
-    // ── Payment Methods ───────────────────
-    Route::get('payment-methods',                  [PaymentMethodController::class, 'index']);
-    Route::post('payment-methods',                 [PaymentMethodController::class, 'store']);
-    Route::patch('payment-methods/{id}/default',   [PaymentMethodController::class, 'setDefault']);
-    Route::delete('payment-methods/{id}',          [PaymentMethodController::class, 'destroy']);
-});
-
-// Paymob webhook — no auth, Paymob calls this server-to-server
-Route::post('payments/callback', [PaymentController::class, 'callback']);
 
 /*
 |--------------------------------------------------------------------------
@@ -87,24 +46,6 @@ Route::middleware(['auth:sanctum', 'is_admin'])->prefix('admin')->group(function
 
     // ── Dashboard ─────────────────────────
     Route::get('dashboard/stats', [DashboardController::class, 'stats']);
-
-  
-
-    // ── Meals ─────────────────────────────
-    Route::post('meals',                              [MealController::class, 'store']);
-    Route::put('meals/{meal}',                         [MealController::class, 'update']);
-    Route::delete('meals/{meal}',                      [MealController::class, 'destroy']);
-    Route::patch('meals/{meal}/toggle-availability',   [MealController::class, 'toggleAvailability']);
-
-    // ── Ingredients ───────────────────────
-    Route::get('ingredients',  [IngredientController::class, 'index']);
-    Route::post('ingredients', [IngredientController::class, 'store']);
-
-    // ── Orders ────────────────────────────
-    Route::get('orders',                     [AdminOrderController::class, 'index']);
-    Route::get('orders/{id}',                [AdminOrderController::class, 'show']);
-    Route::patch('orders/{id}/status',       [AdminOrderController::class, 'updateStatus']);
-    Route::patch('orders/{id}/assign-rider', [AdminOrderController::class, 'assignRider']);
 
     // ── Users ─────────────────────────────
     Route::get('users',                       [AdminUserController::class, 'index']);

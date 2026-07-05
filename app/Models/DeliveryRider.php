@@ -2,27 +2,39 @@
 
 namespace App\Models;
 
+use App\Enums\TransportationWay;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Notifications\Notifiable;
 
-class DeliveryRider extends Model
+class DeliveryRider extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     protected $fillable = [
         'name',
         'phone',
+        'email',
+        'password',
+        'transportation_way',
         'avatar',
         'rating',
         'is_available',
     ];
 
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
     protected function casts(): array
     {
         return [
-            'rating'       => 'decimal:2',
-            'is_available' => 'boolean',
+            'transportation_way' => TransportationWay::class,
+            'rating'              => 'decimal:2',
+            'is_available'        => 'boolean',
+            'password'            => 'hashed',
         ];
     }
 

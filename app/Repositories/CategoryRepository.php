@@ -14,9 +14,14 @@ class CategoryRepository
         return $this->model->orderBy('name')->get();
     }
 
-    public function findById(int $id): ?Category
+   /* public function findById(int $id): ?Category
     {
         return $this->model->find($id);
+    }*/
+
+    public function findById(int $id): ?Category
+    {
+        return $this->model->with('meals.reviews')->find($id);
     }
 
     public function create(array $data): Category

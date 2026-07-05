@@ -23,8 +23,6 @@ return new class extends Migration
             $table->decimal('protein', 8, 2)->nullable();
             $table->decimal('fat', 8, 2)->nullable();
             $table->decimal('fiber', 8, 2)->nullable();
-            $table->decimal('sugar', 8, 2)->nullable();
-            $table->decimal('sodium', 8, 2)->nullable();
             $table->json('ingredients')->nullable();
             $table->boolean('is_available')->default(true);
             $table->timestamps();

@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Meal;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Enums\Ingredient;
+use Illuminate\Validation\Rule;
 
 class StoreMealRequest extends FormRequest
 {
@@ -25,6 +27,9 @@ class StoreMealRequest extends FormRequest
             'fat'          => ['required', 'numeric', 'min:0'],
             'fiber'        => ['required', 'numeric', 'min:0'],
             'is_available' => ['sometimes', 'boolean'],
+
+            'ingredients'   => ['sometimes', 'array'],
+            'ingredients.*' => ['string', Rule::enum(Ingredient::class)],
         ];
     }
 }

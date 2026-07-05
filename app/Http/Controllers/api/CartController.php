@@ -42,17 +42,11 @@ class CartController extends Controller
         );
     }
 
-    public function update(
-        UpdateCartItemRequest $request,
-        int $mealId,
-        UpdateCartItemAction $action,
-        GetCartAction $getCart
-    ): JsonResponse {
+    public function update( UpdateCartItemRequest $request, int $mealId, UpdateCartItemAction $action, GetCartAction $getCart): JsonResponse 
+    {
         $item = $action->execute($request->user()->id, $mealId, $request->quantity);
 
-        if (!$item) {
-            return $this->error('Item not found in cart.', 404);
-        }
+        if (!$item) {  return $this->error('Item not found in cart.', 404);}
 
         $cart = $getCart->execute($request->user()->id);
 

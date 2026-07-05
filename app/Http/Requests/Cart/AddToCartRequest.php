@@ -15,7 +15,7 @@ class AddToCartRequest extends FormRequest
     {
         return [
             'meal_id'  => ['required', 'integer', 'exists:meals,id'],
-            'quantity' => ['required', 'integer', 'min:1'],
+            'quantity' => ['required', 'integer', 'min:1' , 'max:100'],
         ];
     }
 }

@@ -16,6 +16,7 @@ class CategoryResource extends JsonResource
             'image'      => $this->image ? Storage::disk('public')->url($this->image) : null,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'meals'      => MealResource::collection($this->whenLoaded('meals')),
         ];
     }
 }

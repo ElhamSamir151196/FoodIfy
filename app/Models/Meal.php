@@ -23,6 +23,7 @@ class Meal extends Model
         'fat',
         'fiber',
         'is_available',
+        'ingredients',
     ];
 
     protected function casts(): array
@@ -34,6 +35,7 @@ class Meal extends Model
             'fat'          => 'decimal:2',
             'fiber'        => 'decimal:2',
             'is_available' => 'boolean',
+            'ingredients'  => 'array',
         ];
     }
 

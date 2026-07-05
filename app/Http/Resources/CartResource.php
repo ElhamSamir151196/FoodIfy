@@ -14,6 +14,9 @@ class CartResource extends JsonResource
             'meal'     => new MealResource($this->whenLoaded('meal')),
             'quantity' => $this->quantity,
             'subtotal' => round($this->quantity * $this->meal->price, 2),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+
         ];
     }
 }

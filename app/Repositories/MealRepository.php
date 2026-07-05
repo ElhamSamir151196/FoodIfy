@@ -25,7 +25,7 @@ class MealRepository
 
     public function findById(int $id): ?Meal
     {
-        return $this->model->with('category')->find($id);
+        return $this->model->with(['category', 'reviews.user'])->find($id);
     }
 
     public function search(string $term): Collection

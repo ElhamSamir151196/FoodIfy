@@ -2,19 +2,19 @@
 
 namespace App\Repositories;
 
-use App\Models\CartItem;
+use App\Models\Cart;
 use Illuminate\Database\Eloquent\Collection;
 
 class CartRepository
 {
-    public function __construct(private readonly CartItem $model) {}
+    public function __construct(private readonly Cart $model) {}
 
     public function getByUser(int $userId): Collection
     {
         return $this->model->with('meal')->where('user_id', $userId)->get();
     }
 
-    public function addItem(int $userId, int $mealId, int $quantity = 1): CartItem
+    public function addItem(int $userId, int $mealId, int $quantity = 1): Cart
     {
         $item = $this->model->firstOrNew([
             'user_id' => $userId,
@@ -27,7 +27,7 @@ class CartRepository
         return $item;
     }
 
-    public function updateQuantity(int $userId, int $mealId, int $quantity): ?CartItem
+    public function updateQuantity(int $userId, int $mealId, int $quantity): ?Cart
     {
         $item = $this->model
             ->where('user_id', $userId)
@@ -62,6 +62,6 @@ class CartRepository
             ->with('meal')
             ->where('user_id', $userId)
             ->get()
-            ->sum(fn (CartItem $item) => $item->quantity * $item->meal->price);
+            ->sum(fn (Cart $item) => $item->quantity * $item->meal->price);
     }
 }
